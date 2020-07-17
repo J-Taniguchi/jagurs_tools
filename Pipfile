@@ -7,6 +7,9 @@ verify_ssl = true
 pylint = "*"
 
 [packages]
+h5py = "*"
+matplotlib = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.8"
