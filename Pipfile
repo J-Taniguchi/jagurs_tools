@@ -8,8 +8,11 @@ pylint = "*"
 
 [packages]
 h5py = "*"
-matplotlib = "*"
 pandas = "*"
+matplotlib = "*"
+tqdm = "*"
+joblib = "*"
+netcdf4 = "*"
 
 [requires]
 python_version = "3.8"
