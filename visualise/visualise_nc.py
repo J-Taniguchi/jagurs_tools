@@ -1,3 +1,4 @@
+#!/home/taniguchi-j/miniconda3/envs/jagurs_tools/python
 # import pprint
 from glob import glob
 import argparse
@@ -18,7 +19,7 @@ import matplotlib.pyplot as plt
 parser = argparse.ArgumentParser(description="Program to visualise bathy/disp/wave height.")
 
 parser.add_argument("-i", "--input_file", help="nc files to visualise.", required=True)
-parser.add_argument("-d", "--dataset", help="which datasset to discraibe", required=True)
+parser.add_argument("-d", "--dataset", help="which datasset to discraibe", required=True, choices=["bathy", "disp", "wave_height"])
 parser.add_argument("-o", "--output_dir", help="output directory. If it does not exist, it will be made automatically.", required=True)
 parser.add_argument(
     "--dt",
@@ -28,7 +29,6 @@ parser.add_argument(
 parser.add_argument("--max_val", help="max value of color bar.", type=float, default=None)
 parser.add_argument("--dpi", help="dpi of output figure.", type=int, default=200)
 parser.add_argument("-y", "--yes_to_all", help="yes to all", action="store_true")
-parser.add_argument("--disp", help="if you want to visualise displacement, use this flag.(visualise previous sum)", action="store_true")
 parser.add_argument("-n", "--n_jobs", help="number of jobs.", type=int, default=1)
 parser.add_argument("-b", "--bathy", help="bathy grd file. If specified, write 0m line.", type=str, default=None)
 
@@ -41,8 +41,12 @@ max_val = args.max_val
 dpi = args.dpi
 yes_to_all = args.yes_to_all
 n_jobs = args.n_jobs
-disp = args.disp
 bathy = args.bathy
+
+if dataset == "disp":
+    disp = True
+else:
+    disp = False
 
 print("input_file: ", input_file)
 print("dataset: ", dataset)
@@ -60,19 +64,20 @@ if os.path.exists(output_dir):
             exit(0)
 os.makedirs(output_dir, exist_ok=True)
 
+with netCDF4.Dataset(input_file, "r") as f:
+    x = f.variables["lon"][:]
+    y = f.variables["lat"][:]
+    z = f.variables[dataset][:]
+
 if max_val is None:
     print("checking max_val")
     max_val = 0
-    with netCDF4.Dataset(input_file, "r") as f:
-        x = f.variables["lon"][:]
-        y = f.variables["lat"][:]
-        z = f.variables[dataset][:]
     if disp:
         z[np.isnan(z)] = 0.0
         z = z.sum(axis=0)
-        max_val = max([max_val, np.nanmax(z), -np.nanmin(z)])
+        max_val = max([max_val, np.abs(np.nanmax(z)), np.abs(np.nanmin(z))])
     else:
-        max_val = max([max_val, np.nanmax(z), -np.nanmin(z)])
+        max_val = max([max_val, np.abs(np.nanmax(z)), np.abs(np.nanmin(z))])
 print("max_val: ", max_val)
 
 
