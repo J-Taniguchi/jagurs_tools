@@ -29,6 +29,7 @@ parser.add_argument("--dpi", help="dpi of output figure.", type=int, default=200
 parser.add_argument("-y", "--yes_to_all", help="yes to all", action="store_true")
 parser.add_argument("--disp", help="if you want to visualise displacement, use this flag.(visualise previous sum)", action="store_true")
 parser.add_argument("-n", "--n_jobs", help="number of jobs.", type=int, default=1)
+parser.add_argument("--aspect", help="aspect ratio of the figure.", type=float, default=1)
 
 args = parser.parse_args()
 input_file_list = glob(args.input_file)
@@ -39,6 +40,7 @@ dpi = args.dpi
 yes_to_all = args.yes_to_all
 n_jobs = args.n_jobs
 disp = args.disp
+aspect = args.aspect
 
 input_file_list.sort()
 
@@ -84,6 +86,7 @@ def write_fig(i):
         td = timedelta(seconds=dt * i)
         ax.set_title(str(td))
     fig.colorbar(c, ax=ax)
+    ax.set_aspect(aspect)
     fig.tight_layout()
     plt.savefig(fname, dpi=dpi)
     plt.close()
