@@ -49,6 +49,7 @@ def main():
     parser.add_argument("-b", "--bathy", help="bathy grd file. If specified, write 0m line.", type=str, default=None)
     parser.add_argument("--aspect", help="aspect ratio of the figure.", type=float, default=1)
     parser.add_argument("--contour", help="flag for write contour of terrain", action="store_true")
+    parser.add_argument("--output_type", help="output image type.", choices=["png", "jpg", "svg"], default="jpg")
 
     args = parser.parse_args()
     input_file = args.input_file
@@ -62,6 +63,7 @@ def main():
     bathy_file = args.bathy
     aspect = args.aspect
     write_contour = args.contour
+    output_type = args.output_type
 
     if dataset in non_sequence_data_types:
         pass
@@ -120,7 +122,7 @@ def main():
 
     if dataset in non_sequence_data_types:
         domain = ".".join(os.path.basename(input_file).split(".")[0:-1])
-        fname = os.path.join(output_dir, "{}_maxh.png".format(domain))
+        fname = os.path.join(output_dir, "{}_maxh.{}".format(domain, output_type))
         write_fig(
             x,
             y,
@@ -139,7 +141,7 @@ def main():
         job_list = []
         for i in range(z.shape[0]):
             fname_prefix = "{:08}".format(i)
-            now_fname = os.path.join(output_dir, fname_prefix + ".png")
+            now_fname = os.path.join(output_dir, fname_prefix + "." + output_type)
             if is_disp:
                 now_z = z[:i + 1, :, :].sum(axis=0)
             else:
